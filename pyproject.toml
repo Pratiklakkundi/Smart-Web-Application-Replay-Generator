@@ -1,8 +1,10 @@
 [project]
-name = "repl-nix-workspace"
-version = "0.1.0"
-description = "Add your description here"
+name = "smart-web-attack-replay-generator"
+version = "1.0.0"
+description = "Smart Web Application Attack Replay Generator - Parse logs, detect attacks, generate replay scripts"
 requires-python = ">=3.11"
 dependencies = [
     "streamlit>=1.51.0",
+    "pandas>=2.0.0",
+    "requests>=2.31.0",
 ]
