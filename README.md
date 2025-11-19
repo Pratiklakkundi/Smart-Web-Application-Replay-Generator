@@ -24,6 +24,15 @@ A Python-based security research tool that parses web server logs, automatically
 - **Interactive Dashboard**: Streamlit-based web UI for easy analysis
 - **Comprehensive Reports**: JSON-formatted summary reports with detailed statistics
 
+### Advanced Features (PostgreSQL Required)
+
+- **Pattern Learning**: Automatically tracks unknown/suspicious requests for pattern discovery
+- **Batch Processing**: Analyze multiple log files simultaneously with aggregate statistics
+- **Timeline Visualization**: Interactive charts showing attack trends over time
+- **Custom Pattern Management**: Define and manage your own regex-based attack detection rules
+- **Analysis History**: Persistent storage of all log analyses with searchable history
+- **Automated Replay Execution**: Execute generated scripts and capture results programmatically
+
 ### Attack Detection Engine
 
 The tool can detect the following attack types:
@@ -39,7 +48,7 @@ The tool can detect the following attack types:
 ```
 smart-web-attack-replay-generator/
 │
-├── app.py                      # Main Streamlit application
+├── app.py                      # Main Streamlit application (9 tabs)
 ├── sample.log                  # Sample log file with attack patterns
 ├── README.md                   # This file
 ├── pyproject.toml             # Python dependencies
@@ -48,10 +57,16 @@ smart-web-attack-replay-generator/
 │   └── log_parser.py          # Log parsing module (LogParser class)
 │
 ├── detector/
-│   └── attack_detector.py     # Attack detection module (AttackDetector class)
+│   └── attack_detector.py     # Attack detection with custom pattern support
 │
 ├── generator/
 │   └── replay_generator.py    # Script generation module (ReplayGenerator class)
+│
+├── database/
+│   └── db_manager.py          # PostgreSQL database manager (optional)
+│
+├── batch/
+│   └── batch_processor.py     # Multi-file batch processing
 │
 └── generated_attacks/          # Output directory for generated scripts
     ├── attack_1_SQL_Injection.py
@@ -112,6 +127,7 @@ The application will open in your default browser at `http://localhost:5000`
 
 #### Step 2: Analyze Logs
 
+- Enable "Pattern Learning" in sidebar (requires database) if you want to track unknown attacks
 - Review the log preview
 - Click **"🔍 Analyze Log File"** button
 - Wait for parsing and attack detection to complete
@@ -142,6 +158,35 @@ The application will open in your default browser at `http://localhost:5000`
   - Attack type distribution charts
   - Top attacking IP addresses
   - Exportable JSON reports
+
+#### Advanced Workflows (Database Required)
+
+**Batch Processing:**
+- Navigate to **"🔁 Batch Processing"** tab
+- Upload multiple log files
+- Process all files simultaneously
+- View aggregate statistics across all files
+
+**Timeline Analysis:**
+- Visit **"📉 Timeline View"** tab
+- See attack trends over the last 30 days
+- View historical analysis records
+
+**Pattern Learning:**
+- Check **"🧠 Unknown Attacks"** tab
+- Review suspicious requests that don't match known patterns
+- Create custom patterns from unknown attacks
+
+**Custom Patterns:**
+- Go to **"⚙️ Custom Patterns"** tab
+- Add your own regex-based attack detection rules
+- Manage (activate/deactivate/delete) existing patterns
+
+**Automated Replay:**
+- Navigate to **"🚀 Automated Replay"** tab
+- Select generated scripts to execute
+- Configure timeout and concurrent execution
+- Download execution reports
 
 ### Using Generated Scripts
 

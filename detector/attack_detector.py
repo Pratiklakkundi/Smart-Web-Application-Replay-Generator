@@ -1,8 +1,10 @@
 import re
-from typing import Dict, List, Set
+from typing import Dict, List, Set, Optional
 
 class AttackDetector:
-    def __init__(self):
+    def __init__(self, db_manager=None, enable_learning=False):
+        self.db_manager = db_manager
+        self.enable_learning = enable_learning
         self.attack_patterns = {
             'SQL Injection': [
                 r"(\bUNION\b.*\bSELECT\b)",
@@ -74,6 +76,30 @@ class AttackDetector:
             self.compiled_patterns[attack_type] = [
                 re.compile(pattern, re.IGNORECASE) for pattern in patterns
             ]
+        
+        if self.db_manager:
+            self.load_custom_patterns()
+    
+    def load_custom_patterns(self):
+        if not self.db_manager:
+            return
+        
+        try:
+            custom_patterns = self.db_manager.get_custom_patterns(active_only=True)
+            for pattern_data in custom_patterns:
+                attack_type = pattern_data['attack_type']
+                pattern_regex = pattern_data['pattern_regex']
+                
+                if attack_type not in self.compiled_patterns:
+                    self.compiled_patterns[attack_type] = []
+                
+                try:
+                    compiled = re.compile(pattern_regex, re.IGNORECASE)
+                    self.compiled_patterns[attack_type].append(compiled)
+                except re.error:
+                    pass
+        except Exception:
+            pass
 
     def detect_attacks(self, log_entry: Dict[str, str]) -> List[Dict[str, any]]:
         detected_attacks = []
@@ -103,6 +129,7 @@ class AttackDetector:
         all_attacks = []
         attack_type_counts = {}
         ip_attacks = {}
+        unknown_count = 0
         
         for log_entry in parsed_logs:
             attacks = self.detect_attacks(log_entry)
@@ -117,11 +144,26 @@ class AttackDetector:
                     if ip not in ip_attacks:
                         ip_attacks[ip] = []
                     ip_attacks[ip].append(attack_type)
+            elif self.enable_learning and self.db_manager:
+                status_code = log_entry.get('status', '')
+                if status_code and status_code not in ['200', '201', '204', '301', '302', '304']:
+                    try:
+                        self.db_manager.track_unknown_attack(
+                            url=log_entry.get('url', ''),
+                            ip=log_entry.get('ip', ''),
+                            timestamp=log_entry.get('timestamp', ''),
+                            method=log_entry.get('method', ''),
+                            user_agent=log_entry.get('user_agent', '')
+                        )
+                        unknown_count += 1
+                    except Exception:
+                        pass
         
         return {
             'total_attacks': len(all_attacks),
             'attacks': all_attacks,
             'attack_type_counts': attack_type_counts,
             'ip_attacks': ip_attacks,
-            'unique_ips': len(ip_attacks)
+            'unique_ips': len(ip_attacks),
+            'unknown_tracked': unknown_count
         }
