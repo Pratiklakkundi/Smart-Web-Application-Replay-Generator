@@ -17,7 +17,7 @@ Advanced Web Application Security Testing Platform with AI-powered attack detect
 
 ### Prerequisites
 - Python 3.8 or higher
-- pip package manager
+- pip package manager.
 
 ### Install Dependencies
 ```bash
